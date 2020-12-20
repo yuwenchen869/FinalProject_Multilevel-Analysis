@@ -143,11 +143,33 @@ ggplot(aes(Age, Grip))+
        y="Grip Performance(kg)")
 ```
 
-## Gain and Baseline Grip
+## By Gender
+```{r echo=FALSE}
+ggplot(dta, aes(Time, Grip)) +
+ facet_grid(~Gender)+
+ geom_boxplot() +
+ geom_jitter(position = position_jitter(width = 0.1), cex = 0.8) +
+ labs(x = "Time", y = "Grip strength")+
+ theme_bw()
+```
+
+## Different Baseline of Grip gains by Different Frailty Status
 ```{r grip data Wide, include=FALSE}
 dtag<-dta %>% select(ID, Class, Age, Grip, Time, Gender, SOF_def, KCL_def)
 dtagW<-dtag %>% spread(Time, Grip) %>% mutate(gain=Intervention-Baseline)
 ```
+
+```{r echo=FALSE}
+dtagW %>% na.omit()%>%
+  ggplot(aes(Baseline, gain, group=SOF_def, color=SOF_def))+
+  geom_point(size=.7, alpha=.5)+
+  geom_smooth(method=lm, se=F, size=rel(.8), alpha=.5)+
+  theme_minimal()+
+  labs(title="Liner Relationship for Different Baseline of Grip gains")
+```
+
+
+## Gain and Baseline Grip
 
 ```{r echo=FALSE}
 ggplot(data=subset(dtagW, Class!="I"), 
@@ -190,15 +212,6 @@ ggplot(data=subset(dtagW, Class!="I"),
        legend.position="NONE")
 ```
 
-## Different Baseline of Grip gains
-```{r echo=FALSE}
-dtagW %>% na.omit()%>%
-  ggplot(aes(Baseline, gain, group=SOF_def, color=SOF_def))+
-  geom_point(size=.7, alpha=.5)+
-  geom_smooth(method=lm, se=F, size=rel(.8), alpha=.5)+
-  theme_minimal()+
-  labs(title="Liner Relationship for Different Baseline of Grip gains")
-```
 
 ## Different Class of Grip gains
 ```{r}
@@ -214,16 +227,6 @@ sdta<-data.frame(Class=row.names(coef(m_g)$Class),
 arrange(sdta, -gain_ave)
 ```
 - Improvement on Grip: B>E>F>D>C>G>K>H>J
-## By Gender
-```{r echo=FALSE}
-ggplot(dta, aes(Time, Grip)) +
- facet_grid(~Gender)+
- geom_boxplot() +
- geom_jitter(position = position_jitter(width = 0.1), cex = 0.8) +
- labs(x = "Time", y = "Grip strength")+
- theme_bw()
-```
-
 
 ## By Gender and Class
 ```{r echo=FALSE}
